@@ -1,12 +1,12 @@
 import pprint
 from helper_func import (generate_binary_subnet_mask, subnet_to_octet, needed_bits_to_complete_octet,
                          octet_dec_to_bin, apply_pipe, calc_bin_with_pipe, construct_network_address,
-                         format_address_into_string)
+                         format_address_into_string, classify_address_class, calc_num_of_subnets, calc_num_of_host)
 
-pp = pprint.PrettyPrinter(indent=2, depth=6, sort_dicts=False)
+pp = pprint.PrettyPrinter(indent=2, depth=8, sort_dicts=False)
 
-user_ip_address = [172, 26, 200, 55]
-user_subnet_mask = 19
+user_ip_address = [128, 26, 200, 55]
+user_subnet_mask = 28
 
 subnet_mask = f"/{user_subnet_mask}"
 on_octet = subnet_to_octet(n=user_subnet_mask)
@@ -30,10 +30,25 @@ network_address = construct_network_address(
     left_side_pipe_val=left_side_pipe_value
 )
 
+# Number of Available Subnets
+address_class = classify_address_class(address=user_ip_address)
+number_of_available_subnets = calc_num_of_subnets(
+    address_default_subnet_mask=address_class["default_subnet_mask"],
+    custom_subnet_mask=user_subnet_mask
+)
+
+# Number of Hosts
+number_of_hosts = calc_num_of_host(custom_subnet_mask=user_subnet_mask)
+
 
 identification = {
     "ip_address": format_address_into_string(address=user_ip_address),
     "subnet_mask": subnet_mask,
+    "class": {
+        "IP Address Class": address_class['class'],
+        "Default Subnet Mask": f"/{address_class['default_subnet_mask']}",
+        "Class Range": f"{address_class["1st_octet_range"][0]} to {address_class["1st_octet_range"][1]}"
+    },
     "on_octet": on_octet,
     "binary_subnet_mask": format_address_into_string(address=binary_subnet_mask, is_binary=True),
     "network_portion": network_portion,
@@ -47,6 +62,8 @@ identification = {
         f"left_side_of_pipe_val": left_side_pipe_value,
     },
     f"network_address": f"{format_address_into_string(network_address)}/{user_subnet_mask}",
+    "Number Of Available Subnets": number_of_available_subnets,
+    "Number of Hosts": number_of_hosts,
 }
 
 pp.pprint(identification)

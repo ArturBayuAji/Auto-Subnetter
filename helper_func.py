@@ -1,5 +1,45 @@
 import math
 
+bits_value = [128, 64, 32, 16, 8, 4, 2, 1]
+
+address_classes_and_subnet_mask = [
+    {
+        "class": "A",
+        "1st_octet_range": [1, 126],
+        "default_subnet_mask": 8
+    },
+    {
+        "class": "B",
+        "1st_octet_range": [128, 191],
+        "default_subnet_mask": 16
+    },
+    {
+        "class": "C",
+        "1st_octet_range": [192, 223],
+        "default_subnet_mask": 24,
+    }
+]
+
+
+# TODO: finish this below
+def classify_address_class(address: list) -> dict:
+    """
+    Classify the class of the IP Address.
+    :param address: (list) Address to classify
+    :return: (dict) complete information of the IP Address Class
+    """
+    user_octet_1 = address[0]
+
+    if user_octet_1 == 0 or user_octet_1 == 127:
+        raise Exception("Address is either identification for 'this network' or a loop back.")
+
+    for address_class in address_classes_and_subnet_mask:
+        octet_range = address_class['1st_octet_range']
+        left_bound = octet_range[0]
+        right_bound = octet_range[1]
+        if left_bound <= user_octet_1 <= right_bound:
+            return address_class
+
 
 def generate_binary_subnet_mask(n: int) -> list:
     """
@@ -55,9 +95,6 @@ def needed_bits_to_complete_octet(octet: list) -> int:
         if i == 0:
             count += 1
     return count
-
-
-bits_value = [128, 64, 32, 16, 8, 4, 2, 1]
 
 
 def octet_dec_to_bin(n: int, bits_val=None) -> list:
@@ -193,3 +230,32 @@ def format_address_into_string(address: list, is_binary=False) -> str:
     # e.g. [172, 26, 200, 55]
     result = '.'.join([str(el) for el in address])
     return result
+
+
+def calc_num_of_subnets(address_default_subnet_mask: int, custom_subnet_mask: int) -> int:
+    """
+    Calculate number of available subnets
+    :param address_default_subnet_mask: (int) Class's default subnet mask
+    :param custom_subnet_mask: (int) User custom subnet mask
+    :return: (int) number of available subnets
+    """
+    borrowed_bits = custom_subnet_mask - address_default_subnet_mask
+    num_subnets = 2**borrowed_bits
+    return num_subnets
+
+
+def calc_num_of_host(custom_subnet_mask: int) -> int:
+    """
+    Calculate number of hosts
+    :param custom_subnet_mask: (int) User custom subnet mask
+    :return: (int) number of available hosts
+    """
+    host_bits = 32 - custom_subnet_mask
+    num_hosts = (2**host_bits) - 2
+    return num_hosts
+
+
+
+
+
+
