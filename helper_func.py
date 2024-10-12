@@ -106,7 +106,7 @@ def octet_dec_to_bin(n: int, bits_val=None) -> list:
     """
     if bits_val is None:
         bits_val = bits_value
-    if not (1 <= n <= 255):
+    if not (0 <= n <= 255):
         raise Exception("Octet decimal value is between 1 and 255 inclusive")
 
     # bits_value = [128, 64, 32, 16, 8, 4, 2, 1]
@@ -162,6 +162,17 @@ def calc_bin_with_pipe(binary: list, bits_val=None) -> int:
         elif binary[i] == 0:
             pass
     return total
+
+
+def calc_subnet_increment(missing_bit: int) -> int:
+    """
+    Calculate subnet increment value for calculating the network address.
+    :param missing_bit: (int) missing bit or bits needed to complete the 'on_octet' or target octet.
+    :return: (int) subnets network address increment value
+    """
+    bit_index = - (missing_bit + 1)
+    increment_value = bits_value[bit_index]
+    return increment_value
 
 
 def construct_network_address(ip_add: list, oc_tar: int, left_side_pipe_val: int) -> list:

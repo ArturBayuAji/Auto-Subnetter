@@ -1,12 +1,13 @@
 import pprint
 from helper_func import (generate_binary_subnet_mask, subnet_to_octet, needed_bits_to_complete_octet,
                          octet_dec_to_bin, apply_pipe, calc_bin_with_pipe, construct_network_address,
-                         format_address_into_string, classify_address_class, calc_num_of_subnets, calc_num_of_host)
+                         format_address_into_string, classify_address_class, calc_num_of_subnets, calc_num_of_host,
+                         calc_subnet_increment)
 
 pp = pprint.PrettyPrinter(indent=2, depth=8, sort_dicts=False)
 
-user_ip_address = [128, 26, 200, 55]
-user_subnet_mask = 28
+user_ip_address = [172, 20, 10, 45]
+user_subnet_mask = 22
 
 subnet_mask = f"/{user_subnet_mask}"
 on_octet = subnet_to_octet(n=user_subnet_mask)
@@ -40,6 +41,9 @@ number_of_available_subnets = calc_num_of_subnets(
 # Number of Hosts
 number_of_hosts = calc_num_of_host(custom_subnet_mask=user_subnet_mask)
 
+# Subnet Increment Value
+subnet_increment_value = calc_subnet_increment(missing_bit=bits_needed_to_complete_corresponding_octet)
+
 
 identification = {
     "ip_address": format_address_into_string(address=user_ip_address),
@@ -63,7 +67,8 @@ identification = {
     },
     f"network_address": f"{format_address_into_string(network_address)}/{user_subnet_mask}",
     "Number Of Available Subnets": number_of_available_subnets,
-    "Number of Hosts": number_of_hosts,
+    "Number of Hosts per Subnet": number_of_hosts,
+    "Subnet Increment Value": subnet_increment_value,
 }
 
 pp.pprint(identification)
