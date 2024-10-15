@@ -9,13 +9,13 @@ address_classes_and_subnet_mask = [
         "class": "A",
         "1st_octet_range": [1, 126],
         "default_subnet_mask": 8,
-        "subnetting_range": [8, 15]
+        "subnetting_range": [8, 30]
     },
     {
         "class": "B",
         "1st_octet_range": [128, 191],
         "default_subnet_mask": 16,
-        "subnetting_range": [16, 23]
+        "subnetting_range": [16, 30]
     },
     {
         "class": "C",

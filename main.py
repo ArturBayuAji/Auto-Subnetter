@@ -7,8 +7,8 @@ from helper_func import (generate_binary_subnet_mask, subnet_to_octet, needed_bi
 
 pp = pprint.PrettyPrinter(indent=2, depth=8, sort_dicts=False)
 
-user_ip_address = [198, 22, 45, 193]
-user_subnet_mask = 27
+user_ip_address = [135, 15, 10, 138]
+user_subnet_mask = 29
 
 # Makesure the logic of subnetting is followed before proceeding the calculation
 address_class = classify_address_class(address=user_ip_address)
