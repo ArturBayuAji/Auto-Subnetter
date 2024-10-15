@@ -1,27 +1,31 @@
 import math
 
+from typing import List
+
 bits_value = [128, 64, 32, 16, 8, 4, 2, 1]
 
 address_classes_and_subnet_mask = [
     {
         "class": "A",
         "1st_octet_range": [1, 126],
-        "default_subnet_mask": 8
+        "default_subnet_mask": 8,
+        "subnetting_range": [8, 15]
     },
     {
         "class": "B",
         "1st_octet_range": [128, 191],
-        "default_subnet_mask": 16
+        "default_subnet_mask": 16,
+        "subnetting_range": [16, 23]
     },
     {
         "class": "C",
         "1st_octet_range": [192, 223],
         "default_subnet_mask": 24,
+        "subnetting_range": [24, 30]
     }
 ]
 
 
-# TODO: finish this below
 def classify_address_class(address: list) -> dict:
     """
     Classify the class of the IP Address.
@@ -39,6 +43,23 @@ def classify_address_class(address: list) -> dict:
         right_bound = octet_range[1]
         if left_bound <= user_octet_1 <= right_bound:
             return address_class
+
+
+def subnetting_logic_followed(subnet_mask: int, class_info: dict) -> bool:
+    """
+    Check whether the Custom Subnet is in range of the Address Class's subnet mask boundary.
+    :param subnet_mask: (int) user custom subnet
+    :param class_info: (Dict) complete info of an Address (data from `classify_address_class` function)
+    :return: (Bool) True if Custom Subnet is in range, False otherwise.
+    """
+
+    subnet_mask_left_bound = class_info['subnetting_range'][0]
+    subnet_mask_right_bound = class_info['subnetting_range'][1]
+
+    if subnet_mask_left_bound <= subnet_mask <= subnet_mask_right_bound:
+        return True
+    else:
+        return False
 
 
 def generate_binary_subnet_mask(n: int) -> list:
@@ -119,6 +140,27 @@ def octet_dec_to_bin(n: int, bits_val=None) -> list:
         else:
             result.append(0)
 
+    return result
+
+
+def octet_bin_to_dec(oct_bin: List[int], bits_val=None) -> int:
+    """
+    Translate binary octet (list of int) into its decimal value
+    :param oct_bin: (list of int) the binary octet
+    :param bits_val: (default argument)
+    :return: (int) decimal value of the binary
+    """
+    # e.g. input : [1, 1, 0, 1, 1, 0, 1]
+    if bits_val is None:
+        bits_val = bits_value
+
+    if len(oct_bin) != 8:
+        raise Exception("Octet should have 8 bits or binary number")
+
+    result = 0
+    for bit_index in range(len(oct_bin)):
+        if oct_bin[bit_index] == 1:
+            result = result + bits_val[bit_index]
     return result
 
 
@@ -266,7 +308,42 @@ def calc_num_of_host(custom_subnet_mask: int) -> int:
     return num_hosts
 
 
+def gen_subnet_table(network_address: list, target_octet: int, n_subnets: int, n_host: int, increment_val: int):
+    """
+    Generate Subnet's Network Address.
+    :param network_address: (list) Calculated network address
+    :param target_octet: (int) The number of octet to start
+    :param n_subnets: (int) Number of subnets to create
+    :param n_host: (int) Number of hosts per subnet
+    :param increment_val: (int) Increment value of the network address.
+    :return: (list) of Subnet's Network Address.
+    """
 
+    target_octet -= 1
+    result = []
+    for i in range(n_subnets):
+        if i == 0:
+            network_address_c = network_address.copy()
+            network_address_c[target_octet] = 0
+            result.append(network_address_c)
+        else:
+            network_address_c = result[i - 1].copy()
 
+            if network_address_c[target_octet] + increment_val <= 255:
+                network_address_c[target_octet] += increment_val
+            else:
+                network_address_c[target_octet] = 0
+                # preparing for while loop
+                i = target_octet - 1
+                while i >= 0:
+                    if network_address_c[i] < 255:
+                        network_address_c[i] += 1
+                        # shutdown the while loop
+                        i = -1
+                    else:
+                        network_address_c[i] = 0
+                        i -= 1
 
+            result.append(network_address_c)
 
+    return result
